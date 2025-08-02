@@ -24,8 +24,6 @@ export default function LiveCountdown({ timer, showPreview = true, compact = fal
 
   const textColor = timer.style?.textColor || "#ffffff";
 
-  console.log("Text color:", timer.style?.textColor);
-
 
   if (compact) {
     const urgencyActive = isUrgencyMode() || (timer.urgencySettings?.enabled && timer.urgencySettings?.showBanner);
