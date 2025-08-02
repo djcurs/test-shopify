@@ -22,6 +22,7 @@ model Timer {
   loop                Boolean  @default(false)
   hideAfterCompletion Boolean  @default(false)
   active              Boolean  @default(true)
+  urgencySettings     Json?
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
   analytics           Json?

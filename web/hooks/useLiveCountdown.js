@@ -91,6 +91,16 @@ export function useLiveCountdown(timer) {
     return false;
   };
 
+  // Check if urgency mode should be active
+  const isUrgencyMode = () => {
+    if (!timer.urgencySettings?.enabled || timerState !== "active") {
+      return false;
+    }
+    
+    const minutesLeft = timeLeft ? Math.floor(timeLeft / (1000 * 60)) : 0;
+    return minutesLeft <= timer.urgencySettings.triggerMinutes;
+  };
+
   return {
     timeLeft,
     timerState,
@@ -99,5 +109,6 @@ export function useLiveCountdown(timer) {
     formattedTime: formatTimeLeft(timeLeft || 0),
     shouldHide,
     loopCount,
+    isUrgencyMode,
   };
 } 

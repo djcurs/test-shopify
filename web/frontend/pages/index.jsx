@@ -4,85 +4,101 @@ import {
   Page,
   Layout,
   Button,
+  InlineStack,
+  BlockStack,
   Text,
   Badge,
-  ButtonGroup,
+  Box,
   EmptyState,
   Frame,
   Loading,
+  DataTable,
   Toast,
-  Box,
-  InlineStack,
-  BlockStack,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useTimerAPI } from "../../hooks/useTimerAPI";
+import TimerModal from "../components/TimerModal";
 
 export default function HomePage() {
-  const { useTimers, useDeleteTimer, useToggleTimer } = useTimerAPI();
-  const { data: timers = [], isLoading, error } = useTimers();
+  const { useTimers, useDeleteTimer } = useTimerAPI();
+  const { data: timers = [], isLoading, error, refetch } = useTimers();
   const deleteTimerMutation = useDeleteTimer();
-  const toggleTimerMutation = useToggleTimer();
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingTimer, setEditingTimer] = useState(null);
   const [toastActive, setToastActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  const showToast = useCallback((message) => {
-    setToastMessage(message);
-    setToastActive(true);
+  const handleCreateTimer = useCallback(() => {
+    setEditingTimer(null);
+    setModalOpen(true);
   }, []);
 
-  const handleToggleActive = useCallback(async (timer) => {
+  const handleEditTimer = useCallback((timer) => {
+    setEditingTimer(timer);
+    setModalOpen(true);
+  }, []);
+
+  const handleDeleteTimer = useCallback(async (timerId) => {
     try {
-      await toggleTimerMutation.mutateAsync({
-        id: timer.id,
-        active: !timer.active,
-      });
-      showToast(
-        timer.active
-          ? "Timer deactivated successfully"
-          : "Timer activated successfully"
-      );
+      await deleteTimerMutation.mutateAsync(timerId);
+      setToastMessage("Timer deleted successfully!");
+      setToastActive(true);
     } catch (error) {
-      showToast("Failed to update timer status");
+      setToastMessage("Failed to delete timer");
+      setToastActive(true);
     }
-  }, [toggleTimerMutation, showToast]);
+  }, [deleteTimerMutation]);
 
-  const handleDelete = useCallback(async (timer) => {
-    try {
-      await deleteTimerMutation.mutateAsync(timer.id);
-      showToast("Timer deleted successfully");
-    } catch (error) {
-      showToast("Failed to delete timer");
-    }
-  }, [deleteTimerMutation, showToast]);
+  const handleModalSuccess = useCallback(() => {
+    setToastMessage(editingTimer ? "Timer updated successfully!" : "Timer created successfully!");
+    setToastActive(true);
+    refetch();
+  }, [editingTimer, refetch]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "Not set";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const handleModalClose = useCallback(() => {
+    setModalOpen(false);
+    setEditingTimer(null);
+  }, []);
 
-  const getTimerStatus = (timer) => {
-    if (!timer.active) return <Badge tone="critical">Inactive</Badge>;
-    
-    const now = new Date();
-    const startTime = timer.startTime ? new Date(timer.startTime) : null;
-    const endTime = timer.endTime ? new Date(timer.endTime) : null;
+  // Prepare table data
+  const tableRows = timers.map((timer) => {
+    const status = timer.active 
+      ? <Badge tone="success">Active</Badge>
+      : <Badge>Inactive</Badge>;
 
-    if (startTime && now < startTime) {
-      return <Badge tone="warning">Scheduled</Badge>;
-    }
-    if (endTime && now > endTime) {
-      return <Badge>Completed</Badge>;
-    }
-    return <Badge tone="success">Active</Badge>;
-  };
+    return [
+      timer.title || "Untitled Timer",
+      status,
+      timer.startTime ? new Date(timer.startTime).toLocaleDateString() : "Immediate",
+      timer.endTime ? new Date(timer.endTime).toLocaleDateString() : "Duration-based",
+      new Date(timer.createdAt).toLocaleDateString(),
+      <InlineStack gap="200">
+        <Button
+          size="slim"
+          onClick={() => handleEditTimer(timer)}
+        >
+          Edit
+        </Button>
+        <Button
+          size="slim"
+          tone="critical"
+          onClick={() => handleDeleteTimer(timer.id)}
+        >
+          Delete
+        </Button>
+      </InlineStack>,
+    ];
+  });
+
+  const tableHeadings = [
+    "Timer Name",
+    "Status",
+    "Start Time",
+    "End Time", 
+    "Created",
+    "Actions",
+  ];
 
   if (isLoading) {
     return (
@@ -95,7 +111,7 @@ export default function HomePage() {
   if (error) {
     return (
       <Page>
-        <TitleBar title="Countdown Timer Dashboard" />
+        <TitleBar title="Countdown Timers" />
         <Layout>
           <Layout.Section>
             <Box padding="400">
@@ -111,18 +127,16 @@ export default function HomePage() {
     );
   }
 
-  const activeTimers = timers.filter(timer => timer.active);
-
   return (
     <Frame>
       <Page
         title="Countdown Timers"
         primaryAction={{
           content: "Create Timer",
-          onAction: () => window.open("/timers/new", "_self"),
+          onAction: handleCreateTimer,
         }}
       >
-        <TitleBar title="Countdown Timer Dashboard" />
+        <TitleBar title="Countdown Timers" />
         
         <Layout>
           <Layout.Section>
@@ -132,96 +146,68 @@ export default function HomePage() {
                   heading="Create your first countdown timer"
                   action={{
                     content: "Create Timer",
-                    onAction: () => window.open("/timers/new", "_self"),
+                    onAction: handleCreateTimer,
                   }}
                   image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
                 >
                   <p>
-                    Countdown timers help create urgency and boost conversions. Start by
-                    creating your first timer.
+                    Start creating countdown timers to boost your sales with urgency.
                   </p>
                 </EmptyState>
               </Box>
             ) : (
-              <Box padding="400">
-                <BlockStack gap="400">
-                  {timers.map((timer) => (
-                    <Box
-                      key={timer.id}
-                      padding="400"
-                      background="surface"
-                      borderWidth="025"
-                      borderRadius="200"
-                      borderColor="border"
-                    >
-                      <BlockStack gap="300">
-                        <InlineStack align="space-between" blockAlign="center">
-                          <BlockStack gap="100">
-                            <Text variant="headingMd" as="h3">
-                              {timer.title || "Untitled Timer"}
-                            </Text>
-                            <Text tone="subdued" variant="bodySm">
-                              {timer.productIds?.length || 0} products • {timer.collectionIds?.length || 0} collections
-                            </Text>
-                          </BlockStack>
-                          <InlineStack gap="200" align="center">
-                            {getTimerStatus(timer)}
-                            <ButtonGroup>
-                              <Button
-                                size="slim"
-                                onClick={() => window.open(`/timers/${timer.id}`, "_self")}
-                              >
-                                Edit
-                              </Button>
-                              <Button
-                                size="slim"
-                                onClick={() => handleToggleActive(timer)}
-                                loading={toggleTimerMutation.isLoading}
-                              >
-                                {timer.active ? "Deactivate" : "Activate"}
-                              </Button>
-                              <Button
-                                size="slim"
-                                tone="critical"
-                                onClick={() => handleDelete(timer)}
-                                loading={deleteTimerMutation.isLoading}
-                              >
-                                Delete
-                              </Button>
-                            </ButtonGroup>
-                          </InlineStack>
-                        </InlineStack>
-                        
-                        <InlineStack align="space-between" blockAlign="center">
-                          <InlineStack gap="400">
-                            <div>
-                              <Text variant="bodySm" tone="subdued">Start Time</Text>
-                              <Text variant="bodyMd">{formatDate(timer.startTime)}</Text>
-                            </div>
-                            <div>
-                              <Text variant="bodySm" tone="subdued">End Time</Text>
-                              <Text variant="bodyMd">{formatDate(timer.endTime)}</Text>
-                            </div>
-                            {timer.duration && (
-                              <div>
-                                <Text variant="bodySm" tone="subdued">Duration</Text>
-                                <Text variant="bodyMd">{timer.duration} minutes</Text>
-                              </div>
-                            )}
-                          </InlineStack>
-                          <div>
-                            <Text variant="bodySm" tone="subdued">Message</Text>
-                            <Text variant="bodyMd">{timer.beforeMessage || "No message"}</Text>
-                          </div>
-                        </InlineStack>
+              <BlockStack gap="400">
+                {/* Timer Stats */}
+                <Box padding="400">
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <BlockStack gap="100">
+                        <Text variant="headingMd" as="h3">
+                          Timer Overview
+                        </Text>
+                        <Text variant="bodyMd" tone="subdued">
+                          Manage your countdown timers
+                        </Text>
                       </BlockStack>
-                    </Box>
-                  ))}
-                </BlockStack>
-              </Box>
+                      <InlineStack gap="200" align="center">
+                        <Text variant="bodyMd">
+                          Total Timers: <strong>{timers.length}</strong>
+                        </Text>
+                        <Text variant="bodyMd">
+                          Active: <strong>{timers.filter(t => t.active).length}</strong>
+                        </Text>
+                      </InlineStack>
+                    </InlineStack>
+                  </BlockStack>
+                </Box>
+
+                {/* Timer Table */}
+                <Box padding="400">
+                  <DataTable
+                    columnContentTypes={[
+                      "text",
+                      "text",
+                      "text",
+                      "text",
+                      "text",
+                      "text",
+                    ]}
+                    headings={tableHeadings}
+                    rows={tableRows}
+                  />
+                </Box>
+              </BlockStack>
             )}
           </Layout.Section>
         </Layout>
+
+        {/* Timer Modal */}
+        <TimerModal
+          open={modalOpen}
+          onClose={handleModalClose}
+          timer={editingTimer}
+          onSuccess={handleModalSuccess}
+        />
 
         {/* Toast */}
         {toastActive && (

@@ -45,9 +45,11 @@ export function useTimerAPI() {
           },
           body: JSON.stringify(timerData),
         });
+        
         if (!response.ok) {
           throw new Error("Failed to create timer");
         }
+        
         return response.json();
       },
       {

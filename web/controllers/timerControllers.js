@@ -15,25 +15,29 @@ const createTimer = async (req, res) => {
       afterMessage, 
       loop, 
       hideAfterCompletion, 
-      active 
+      active,
+      urgencySettings
     } = req.body;
 
+    const timerData = {
+      shopId,
+      title,
+      productIds: productIds || [],
+      collectionIds: collectionIds || [],
+      startTime: startTime ? new Date(startTime) : null,
+      endTime: endTime ? new Date(endTime) : null,
+      duration: duration ? parseInt(duration) : null,
+      style: style || {},
+      beforeMessage,
+      afterMessage,
+      loop: loop ?? false,
+      hideAfterCompletion: hideAfterCompletion ?? false,
+      active: active ?? true,
+      urgencySettings: urgencySettings || {}
+    };
+
     const timer = await prisma.timer.create({
-      data: {
-        shopId,
-        title,
-        productIds: productIds || [],
-        collectionIds: collectionIds || [],
-        startTime: startTime ? new Date(startTime) : null,
-        endTime: endTime ? new Date(endTime) : null,
-        duration,
-        style: style || {},
-        beforeMessage,
-        afterMessage,
-        loop: loop ?? false,
-        hideAfterCompletion: hideAfterCompletion ?? false,
-        active: active ?? true
-      },
+      data: timerData,
     });
     res.status(201).json(timer);
   } catch (error) {
@@ -97,7 +101,8 @@ const updateTimer = async (req, res) => {
       afterMessage, 
       loop, 
       hideAfterCompletion, 
-      active 
+      active,
+      urgencySettings
     } = req.body;
 
     // First check if timer exists and belongs to shop
@@ -120,13 +125,14 @@ const updateTimer = async (req, res) => {
         collectionIds,
         startTime: startTime ? new Date(startTime) : null,
         endTime: endTime ? new Date(endTime) : null,
-        duration,
+        duration: duration ? parseInt(duration) : null,
         style,
         beforeMessage,
         afterMessage,
         loop,
         hideAfterCompletion,
-        active
+        active,
+        urgencySettings
       },
     });
     res.status(200).json(timer);

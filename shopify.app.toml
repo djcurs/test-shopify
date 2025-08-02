@@ -3,7 +3,7 @@
 client_id = "f227f8fe7a1324f320302512dd96c164"
 name = "test"
 handle = "test-19620"
-application_url = "https://luggage-layout-likes-political.trycloudflare.com"
+application_url = "https://christina-ships-fibre-lions.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://luggage-layout-likes-political.trycloudflare.com/auth/callback", "https://luggage-layout-likes-political.trycloudflare.com/auth/shopify/callback", "https://luggage-layout-likes-political.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://christina-ships-fibre-lions.trycloudflare.com/auth/callback", "https://christina-ships-fibre-lions.trycloudflare.com/auth/shopify/callback", "https://christina-ships-fibre-lions.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

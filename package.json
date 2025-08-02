@@ -14,7 +14,8 @@
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "mongodb": "^6.18.0",
-    "prisma": "^6.13.0"
+    "prisma": "^6.13.0",
+    "react-colorful": "^5.6.1"
   },
   "author": "diljan",
   "private": true,
