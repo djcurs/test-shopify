@@ -1,3 +1,4 @@
+// App.jsx - Updated with timer navigation
 import { BrowserRouter } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { NavMenu } from "@shopify/app-bridge-react";
@@ -19,7 +20,9 @@ export default function App() {
         <QueryProvider>
           <NavMenu>
             <a href="/" rel="home" />
-            <a href="/pagename">{t("NavigationMenu.pageName")}</a>
+            <a href="/timers">Countdown Timers</a>
+            <a href="/analytics">Analytics</a>
+            <a href="/settings">Settings</a>
           </NavMenu>
           <Routes pages={pages} />
         </QueryProvider>

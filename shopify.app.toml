@@ -3,7 +3,7 @@
 client_id = "f227f8fe7a1324f320302512dd96c164"
 name = "test"
 handle = "test-19620"
-application_url = "https://british-calendar-stated-babes.trycloudflare.com"
+application_url = "https://dl-og-aircraft-bugs.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,7 +18,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://british-calendar-stated-babes.trycloudflare.com/auth/callback", "https://british-calendar-stated-babes.trycloudflare.com/auth/shopify/callback", "https://british-calendar-stated-babes.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://dl-og-aircraft-bugs.trycloudflare.com/auth/callback", "https://dl-og-aircraft-bugs.trycloudflare.com/auth/shopify/callback", "https://dl-og-aircraft-bugs.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
