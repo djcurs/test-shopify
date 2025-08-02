@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import {
   Page,
   Layout,
-  Card,
   Select,
-  Stack,
-  TextStyle,
-  Subheading,
+  InlineStack,
+  BlockStack,
+  Text,
+
   DataTable,
   Badge,
   Frame,
   Loading,
   EmptyState,
+  Box,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useTimerAPI } from "../../hooks/useTimerAPI";
@@ -67,7 +68,7 @@ export default function AnalyticsPage() {
     const conversionRate = views > 0 ? ((conversions / views) * 100).toFixed(2) : 0;
     
     const status = timer.active 
-      ? <Badge status="success">Active</Badge>
+      ? <Badge tone="success">Active</Badge>
       : <Badge>Inactive</Badge>;
 
     return [
@@ -103,35 +104,39 @@ export default function AnalyticsPage() {
         <TitleBar title="Analytics" />
         <Layout>
           <Layout.Section>
-            <Card sectioned>
-              <TextStyle variation="negative">
-                Error loading analytics: {error.message}
-              </TextStyle>
-            </Card>
+            <Box padding="400">
+              <div style={{ textAlign: "center" }}>
+                <Text tone="critical">
+                  Error loading analytics: {error.message}
+                </Text>
+              </div>
+            </Box>
           </Layout.Section>
         </Layout>
       </Page>
     );
   }
 
-  if (!analyticsData || timers.length === 0) {
+  if (!analyticsData) {
     return (
       <Page>
         <TitleBar title="Analytics" />
         <Layout>
           <Layout.Section>
-            <Card sectioned>
+            <Box padding="400">
               <EmptyState
                 heading="No analytics data available"
-                image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
                 action={{
-                  content: "Create your first timer",
+                  content: "Create Timer",
                   onAction: () => window.open("/timers/new", "_self"),
                 }}
+                image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
               >
-                <p>Create countdown timers to start tracking analytics data.</p>
+                <p>
+                  Create your first timer to start seeing analytics data.
+                </p>
               </EmptyState>
-            </Card>
+            </Box>
           </Layout.Section>
         </Layout>
       </Page>
@@ -139,127 +144,86 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <Page title="Analytics">
-      <TitleBar title="Analytics" />
-      <Layout>
-        <Layout.Section>
-          <Card sectioned>
-            <Stack alignment="center" distribution="equalSpacing">
-              <Stack.Item>
-                <Subheading>Performance Overview</Subheading>
-              </Stack.Item>
-              <Stack.Item>
-                <Select
-                  label="Time Range"
-                  labelHidden
-                  options={timeRangeOptions}
-                  value={timeRange}
-                  onChange={setTimeRange}
-                />
-              </Stack.Item>
-            </Stack>
-          </Card>
-        </Layout.Section>
+    <Frame>
+      <Page title="Analytics">
+        <TitleBar title="Analytics" />
+        <Layout>
+          <Layout.Section>
+            <BlockStack gap="400">
+              {/* Time Range Selector */}
+              <Box padding="400">
+                <InlineStack align="space-between" blockAlign="center">
+                  <Text variant="headingSm" as="h3">Analytics Overview</Text >
+                  <Select
+                    label="Time Range"
+                    labelInline
+                    options={timeRangeOptions}
+                    value={timeRange}
+                    onChange={setTimeRange}
+                  />
+                </InlineStack>
+              </Box>
 
-        {/* Key Metrics */}
-        <Layout.Section>
-          <Stack distribution="fillEvenly" spacing="loose">
-            <Card sectioned>
-              <Stack vertical spacing="extraTight">
-                <TextStyle variation="subdued">Total Timers</TextStyle>
-                <TextStyle variation="strong" element="h2">
-                  {analyticsData.totalTimers}
-                </TextStyle>
-              </Stack>
-            </Card>
+              {/* Analytics Cards */}
+              <InlineStack gap="400" wrap={false}>
+                <Box padding="400" background="surface" borderWidth="025" borderRadius="200" borderColor="border" minWidth="200px">
+                  <BlockStack gap="200">
+                    <Text variant="bodySm" tone="subdued">Total Timers</Text>
+                    <Text variant="headingLg" as="h3">{analyticsData.totalTimers}</Text>
+                  </BlockStack>
+                </Box>
 
-            <Card sectioned>
-              <Stack vertical spacing="extraTight">
-                <TextStyle variation="subdued">Active Timers</TextStyle>
-                <TextStyle variation="strong" element="h2">
-                  {analyticsData.activeTimers}
-                </TextStyle>
-              </Stack>
-            </Card>
+                <Box padding="400" background="surface" borderWidth="025" borderRadius="200" borderColor="border" minWidth="200px">
+                  <BlockStack gap="200">
+                    <Text variant="bodySm" tone="subdued">Active Timers</Text>
+                    <Text variant="headingLg" as="h3">{analyticsData.activeTimers}</Text>
+                  </BlockStack>
+                </Box>
 
-            <Card sectioned>
-              <Stack vertical spacing="extraTight">
-                <TextStyle variation="subdued">Total Views</TextStyle>
-                <TextStyle variation="strong" element="h2">
-                  {analyticsData.totalViews.toLocaleString()}
-                </TextStyle>
-              </Stack>
-            </Card>
+                <Box padding="400" background="surface" borderWidth="025" borderRadius="200" borderColor="border" minWidth="200px">
+                  <BlockStack gap="200">
+                    <Text variant="bodySm" tone="subdued">Total Views</Text>
+                    <Text variant="headingLg" as="h3">{analyticsData.totalViews.toLocaleString()}</Text>
+                  </BlockStack>
+                </Box>
 
-            <Card sectioned>
-              <Stack vertical spacing="extraTight">
-                <TextStyle variation="subdued">Total Conversions</TextStyle>
-                <TextStyle variation="strong" element="h2">
-                  {analyticsData.totalConversions.toLocaleString()}
-                </TextStyle>
-              </Stack>
-            </Card>
+                <Box padding="400" background="surface" borderWidth="025" borderRadius="200" borderColor="border" minWidth="200px">
+                  <BlockStack gap="200">
+                    <Text variant="bodySm" tone="subdued">Total Conversions</Text>
+                    <Text variant="headingLg" as="h3">{analyticsData.totalConversions.toLocaleString()}</Text>
+                  </BlockStack>
+                </Box>
 
-            <Card sectioned>
-              <Stack vertical spacing="extraTight">
-                <TextStyle variation="subdued">Conversion Rate</TextStyle>
-                <TextStyle variation="strong" element="h2">
-                  {analyticsData.conversionRate}%
-                </TextStyle>
-              </Stack>
-            </Card>
-          </Stack>
-        </Layout.Section>
+                <Box padding="400" background="surface" borderWidth="025" borderRadius="200" borderColor="border" minWidth="200px">
+                  <BlockStack gap="200">
+                    <Text variant="bodySm" tone="subdued">Conversion Rate</Text>
+                    <Text variant="headingLg" as="h3">{analyticsData.conversionRate}%</Text>
+                  </BlockStack>
+                </Box>
+              </InlineStack>
 
-        {/* Timer Performance Table */}
-        <Layout.Section>
-          <Card>
-            <Card.Header title="Timer Performance" />
-            <DataTable
-              columnContentTypes={[
-                "text",
-                "text", 
-                "numeric",
-                "numeric",
-                "text",
-                "text",
-              ]}
-              headings={tableHeadings}
-              rows={tableRows}
-            />
-          </Card>
-        </Layout.Section>
-
-        {/* Additional Insights */}
-        <Layout.Section>
-          <Stack distribution="fillEvenly" spacing="loose">
-            <Card sectioned>
-              <Stack vertical spacing="tight">
-                <Subheading>Best Performing Timer</Subheading>
-                <TextStyle>
-                  {timers.length > 0 
-                    ? timers[0].title || "Untitled Timer"
-                    : "No data available"
-                  }
-                </TextStyle>
-                <TextStyle variation="subdued">
-                  Based on conversion rate
-                </TextStyle>
-              </Stack>
-            </Card>
-
-            <Card sectioned>
-              <Stack vertical spacing="tight">
-                <Subheading>Completed Timers</Subheading>
-                <TextStyle>{analyticsData.completedTimers}</TextStyle>
-                <TextStyle variation="subdued">
-                  Timers that have reached their end time
-                </TextStyle>
-              </Stack>
-            </Card>
-          </Stack>
-        </Layout.Section>
-      </Layout>
-    </Page>
+              {/* Timer Performance Table */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingMd" as="h3">Timer Performance</Text>
+                  <DataTable
+                    columnContentTypes={[
+                      "text",
+                      "text",
+                      "numeric",
+                      "numeric",
+                      "numeric",
+                      "text",
+                    ]}
+                    headings={tableHeadings}
+                    rows={tableRows}
+                  />
+                </BlockStack>
+              </Box>
+            </BlockStack>
+          </Layout.Section>
+        </Layout>
+      </Page>
+    </Frame>
   );
 }

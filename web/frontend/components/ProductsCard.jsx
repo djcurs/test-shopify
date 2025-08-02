@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Card, TextContainer, Text } from "@shopify/polaris";
+import { Box, Text, BlockStack, Button } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "react-query";
@@ -48,26 +48,34 @@ export function ProductsCard() {
   };
 
   return (
-    <Card
-      title={t("ProductsCard.title")}
-      sectioned
-      primaryFooterAction={{
-        content: t("ProductsCard.populateProductsButton", {
-          count: productsCount,
-        }),
-        onAction: handlePopulate,
-        loading: isPopulating,
-      }}
-    >
-      <TextContainer spacing="loose">
-        <p>{t("ProductsCard.description")}</p>
-        <Text as="h4" variant="headingMd">
-          {t("ProductsCard.totalProductsHeading")}
-          <Text variant="bodyMd" as="p" fontWeight="semibold">
-            {isLoadingCount ? "-" : data?.count}
-          </Text>
+    <Box padding="400">
+      <BlockStack gap="400">
+        <Text variant="headingMd" as="h2">
+          {t("ProductsCard.title")}
         </Text>
-      </TextContainer>
-    </Card>
+        
+        <Text variant="bodyMd">
+          {t("ProductsCard.description")}
+        </Text>
+        
+        <Text variant="headingSm" as="h3">
+          {t("ProductsCard.totalProductsHeading")}
+        </Text>
+        
+        <Text variant="bodyMd" fontWeight="semibold">
+          {isLoadingCount ? "-" : data?.count}
+        </Text>
+        
+        <Button
+          primary
+          onClick={handlePopulate}
+          loading={isPopulating}
+        >
+          {t("ProductsCard.populateProductsButton", {
+            count: productsCount,
+          })}
+        </Button>
+      </BlockStack>
+    </Box>
   );
 }

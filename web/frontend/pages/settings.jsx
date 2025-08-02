@@ -3,20 +3,20 @@ import React, { useState, useCallback } from "react";
 import {
   Page,
   Layout,
-  Card,
   Form,
   FormLayout,
   TextField,
   Select,
   Checkbox,
   Button,
-  Stack,
+  InlineStack,
+  BlockStack,
   Toast,
   Frame,
-  Subheading,
-  TextStyle,
+  Text,
   Banner,
   ChoiceList,
+  Box,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 
@@ -98,15 +98,13 @@ export default function SettingsPage() {
   const positionOptions = [
     { label: "Top of page", value: "top" },
     { label: "Bottom of page", value: "bottom" },
-    { label: "Floating", value: "floating" },
-    { label: "In product description", value: "product" },
+    { label: "Fixed overlay", value: "overlay" },
   ];
 
   const animationOptions = [
-    { label: "Fade", value: "fade" },
-    { label: "Slide", value: "slide" },
-    { label: "Bounce", value: "bounce" },
-    { label: "None", value: "none" },
+    { label: "Fade in/out", value: "fade" },
+    { label: "Slide in/out", value: "slide" },
+    { label: "No animation", value: "none" },
   ];
 
   const fontFamilyOptions = [
@@ -123,222 +121,181 @@ export default function SettingsPage() {
         title="Settings"
         primaryAction={{
           content: "Save Settings",
-          loading: isSaving,
           onAction: handleSave,
+          loading: isSaving,
         }}
       >
         <TitleBar title="Settings" />
-        
         <Layout>
           <Layout.Section>
-            <Card sectioned>
-              <Subheading>Default Timer Style</Subheading>
-              <FormLayout>
-                <FormLayout.Group>
-                  <TextField
-                    label="Background Color"
-                    value={settings.defaultStyle.backgroundColor}
-                    onChange={handleStyleChange("backgroundColor")}
-                    prefix="#"
-                  />
-                  <TextField
-                    label="Text Color"
-                    value={settings.defaultStyle.textColor}
-                    onChange={handleStyleChange("textColor")}
-                    prefix="#"
-                  />
-                </FormLayout.Group>
+            <BlockStack gap="400">
+              {/* Default Timer Settings */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Default Timer Settings</Text>
+                  
+                  <FormLayout>
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Default Before Message"
+                        value={settings.defaultMessages.before}
+                        onChange={handleSettingChange("defaultMessages", "before")}
+                        placeholder="Limited time offer!"
+                      />
+                      <TextField
+                        label="Default After Message"
+                        value={settings.defaultMessages.after}
+                        onChange={handleSettingChange("defaultMessages", "after")}
+                        placeholder="Offer has ended"
+                      />
+                    </InlineStack>
+                  </FormLayout>
+                </BlockStack>
+              </Box>
 
-                <FormLayout.Group>
-                  <TextField
-                    label="Font Size (px)"
-                    type="number"
-                    value={settings.defaultStyle.fontSize}
-                    onChange={handleStyleChange("fontSize")}
-                    min={10}
-                    max={32}
-                  />
-                  <Select
-                    label="Font Family"
-                    options={fontFamilyOptions}
-                    value={settings.defaultStyle.fontFamily}
-                    onChange={handleStyleChange("fontFamily")}
-                  />
-                </FormLayout.Group>
+              {/* Default Style Settings */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Default Style Settings</Text>
+                  
+                  <FormLayout>
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Background Color"
+                        value={settings.defaultStyle.backgroundColor}
+                        onChange={handleStyleChange("backgroundColor")}
+                        placeholder="#000000"
+                      />
+                      <TextField
+                        label="Text Color"
+                        value={settings.defaultStyle.textColor}
+                        onChange={handleStyleChange("textColor")}
+                        placeholder="#ffffff"
+                      />
+                    </InlineStack>
+                    
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Font Size (px)"
+                        type="number"
+                        value={settings.defaultStyle.fontSize.toString()}
+                        onChange={(value) => handleStyleChange("fontSize")(parseInt(value) || 16)}
+                      />
+                      <Select
+                        label="Font Family"
+                        options={fontFamilyOptions}
+                        value={settings.defaultStyle.fontFamily}
+                        onChange={handleStyleChange("fontFamily")}
+                      />
+                    </InlineStack>
+                    
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Border Radius (px)"
+                        type="number"
+                        value={settings.defaultStyle.borderRadius.toString()}
+                        onChange={(value) => handleStyleChange("borderRadius")(parseInt(value) || 4)}
+                      />
+                      <TextField
+                        label="Padding (px)"
+                        type="number"
+                        value={settings.defaultStyle.padding.toString()}
+                        onChange={(value) => handleStyleChange("padding")(parseInt(value) || 12)}
+                      />
+                    </InlineStack>
+                  </FormLayout>
+                </BlockStack>
+              </Box>
 
-                <FormLayout.Group>
-                  <TextField
-                    label="Border Radius (px)"
-                    type="number"
-                    value={settings.defaultStyle.borderRadius}
-                    onChange={handleStyleChange("borderRadius")}
-                    min={0}
-                    max={20}
-                  />
-                  <TextField
-                    label="Padding (px)"
-                    type="number"
-                    value={settings.defaultStyle.padding}
-                    onChange={handleStyleChange("padding")}
-                    min={4}
-                    max={32}
-                  />
-                </FormLayout.Group>
-              </FormLayout>
-            </Card>
-          </Layout.Section>
+              {/* Display Settings */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Display Settings</Text>
+                  
+                  <FormLayout>
+                    <InlineStack gap="400">
+                      <Select
+                        label="Timer Position"
+                        options={positionOptions}
+                        value={settings.displaySettings.position}
+                        onChange={handleSettingChange("displaySettings", "position")}
+                      />
+                      <Select
+                        label="Animation"
+                        options={animationOptions}
+                        value={settings.displaySettings.animation}
+                        onChange={handleSettingChange("displaySettings", "animation")}
+                      />
+                    </InlineStack>
+                    
+                    <InlineStack gap="400">
+                      <Checkbox
+                        label="Show on Mobile"
+                        checked={settings.displaySettings.showOnMobile}
+                        onChange={handleSettingChange("displaySettings", "showOnMobile")}
+                      />
+                      <Checkbox
+                        label="Show on Desktop"
+                        checked={settings.displaySettings.showOnDesktop}
+                        onChange={handleSettingChange("displaySettings", "showOnDesktop")}
+                      />
+                    </InlineStack>
+                  </FormLayout>
+                </BlockStack>
+              </Box>
 
-          <Layout.Section>
-            <Card sectioned>
-              <Subheading>Default Messages</Subheading>
-              <FormLayout>
-                <TextField
-                  label="Default Before Message"
-                  value={settings.defaultMessages.before}
-                  onChange={handleSettingChange("defaultMessages", "before")}
-                  placeholder="Limited time offer!"
-                />
-                <TextField
-                  label="Default After Message"
-                  value={settings.defaultMessages.after}
-                  onChange={handleSettingChange("defaultMessages", "after")}
-                  placeholder="Offer has ended"
-                />
-              </FormLayout>
-            </Card>
-          </Layout.Section>
+              {/* Notification Settings */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Notification Settings</Text>
+                  
+                  <FormLayout>
+                    <Checkbox
+                      label="Email alerts for timer expiry"
+                      checked={settings.notifications.timerExpiry}
+                      onChange={handleSettingChange("notifications", "timerExpiry")}
+                    />
+                    <Checkbox
+                      label="Email alerts for low conversion rates"
+                      checked={settings.notifications.lowConversion}
+                      onChange={handleSettingChange("notifications", "lowConversion")}
+                    />
+                  </FormLayout>
+                </BlockStack>
+              </Box>
 
-          <Layout.Section secondary>
-            <Card sectioned>
-              <Subheading>Display Settings</Subheading>
-              <FormLayout>
-                <Select
-                  label="Default Position"
-                  options={positionOptions}
-                  value={settings.displaySettings.position}
-                  onChange={handleSettingChange("displaySettings", "position")}
-                />
-
-                <Select
-                  label="Animation"
-                  options={animationOptions}
-                  value={settings.displaySettings.animation}
-                  onChange={handleSettingChange("displaySettings", "animation")}
-                />
-
-                <Checkbox
-                  label="Show on Mobile"
-                  checked={settings.displaySettings.showOnMobile}
-                  onChange={handleSettingChange("displaySettings", "showOnMobile")}
-                />
-
-                <Checkbox
-                  label="Show on Desktop"
-                  checked={settings.displaySettings.showOnDesktop}
-                  onChange={handleSettingChange("displaySettings", "showOnDesktop")}
-                />
-              </FormLayout>
-            </Card>
-
-            <Card sectioned>
-              <Subheading>Notifications</Subheading>
-              <FormLayout>
-                <Checkbox
-                  label="Email Alerts"
-                  checked={settings.notifications.emailAlerts}
-                  onChange={handleSettingChange("notifications", "emailAlerts")}
-                  helpText="Receive email notifications for important events"
-                />
-
-                <Checkbox
-                  label="Timer Expiry Notifications"
-                  checked={settings.notifications.timerExpiry}
-                  onChange={handleSettingChange("notifications", "timerExpiry")}
-                  helpText="Get notified when timers expire"
-                />
-
-                <Checkbox
-                  label="Low Conversion Alerts"
-                  checked={settings.notifications.lowConversion}
-                  onChange={handleSettingChange("notifications", "lowConversion")}
-                  helpText="Alert when timer conversion rates are low"
-                />
-              </FormLayout>
-            </Card>
-
-            <Card sectioned>
-              <Subheading>Advanced Settings</Subheading>
-              <FormLayout>
-                <TextField
-                  label="Custom CSS"
-                  value={settings.advanced.customCSS}
-                  onChange={handleSettingChange("advanced", "customCSS")}
-                  multiline={4}
-                  helpText="Add custom CSS for timer styling"
-                  placeholder=".timer-widget { /* your styles */ }"
-                />
-
-                <TextField
-                  label="Custom Tracking Code"
-                  value={settings.advanced.trackingCode}
-                  onChange={handleSettingChange("advanced", "trackingCode")}
-                  helpText="Add custom tracking or analytics code"
-                  placeholder="<!-- tracking code -->"
-                />
-
-                <TextField
-                  label="Cache Duration (seconds)"
-                  type="number"
-                  value={settings.advanced.cacheTimer}
-                  onChange={handleSettingChange("advanced", "cacheTimer")}
-                  helpText="How long to cache timer data"
-                  min={60}
-                  max={3600}
-                />
-              </FormLayout>
-            </Card>
-          </Layout.Section>
-        </Layout>
-
-        {/* Preview */}
-        <Layout>
-          <Layout.Section>
-            <Card sectioned>
-              <Subheading>Preview</Subheading>
-              <div style={{ marginTop: "16px" }}>
-                <div
-                  style={{
-                    backgroundColor: settings.defaultStyle.backgroundColor,
-                    color: settings.defaultStyle.textColor,
-                    fontSize: `${settings.defaultStyle.fontSize}px`,
-                    fontFamily: settings.defaultStyle.fontFamily,
-                    borderRadius: `${settings.defaultStyle.borderRadius}px`,
-                    padding: `${settings.defaultStyle.padding}px`,
-                    textAlign: "center",
-                    border: "1px solid #e1e3e5",
-                    maxWidth: "300px",
-                  }}
-                >
-                  <div style={{ marginBottom: "8px" }}>
-                    {settings.defaultMessages.before}
-                  </div>
-                  <div style={{ fontWeight: "bold", fontSize: "1.2em" }}>
-                    2d 14h 32m 45s
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </Layout.Section>
-        </Layout>
-
-        <Layout>
-          <Layout.Section>
-            <Banner status="info">
-              <p>
-                These settings will be applied as defaults for new timers. 
-                Existing timers will retain their current settings unless manually updated.
-              </p>
-            </Banner>
+              {/* Advanced Settings */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Advanced Settings</Text>
+                  
+                  <FormLayout>
+                    <TextField
+                      label="Custom CSS"
+                      value={settings.advanced.customCSS}
+                      onChange={handleSettingChange("advanced", "customCSS")}
+                      multiline={4}
+                      placeholder="/* Add custom CSS here */"
+                    />
+                    
+                    <TextField
+                      label="Tracking Code"
+                      value={settings.advanced.trackingCode}
+                      onChange={handleSettingChange("advanced", "trackingCode")}
+                      multiline={3}
+                      placeholder="<!-- Add tracking code here -->"
+                    />
+                    
+                    <TextField
+                      label="Cache Timer (seconds)"
+                      type="number"
+                      value={settings.advanced.cacheTimer.toString()}
+                      onChange={(value) => handleSettingChange("advanced", "cacheTimer")(parseInt(value) || 300)}
+                    />
+                  </FormLayout>
+                </BlockStack>
+              </Box>
+            </BlockStack>
           </Layout.Section>
         </Layout>
 

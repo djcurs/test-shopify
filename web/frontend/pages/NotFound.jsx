@@ -1,18 +1,20 @@
-import { Card, EmptyState, Page } from "@shopify/polaris";
-import { useTranslation } from "react-i18next";
-import { notFoundImage } from "../assets";
+import { Box, EmptyState, Page, BlockStack } from "@shopify/polaris";
 
 export default function NotFound() {
-  const { t } = useTranslation();
   return (
     <Page>
-      <Card>
-        <Card.Section>
-          <EmptyState heading={t("NotFound.heading")} image={notFoundImage}>
-            <p>{t("NotFound.description")}</p>
-          </EmptyState>
-        </Card.Section>
-      </Card>
+      <Box padding="400">
+        <EmptyState
+          heading="Page not found"
+          action={{
+            content: "Back to home",
+            onAction: () => window.location.href = "/",
+          }}
+          image="https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg"
+        >
+          <p>The page you're looking for doesn't exist.</p>
+        </EmptyState>
+      </Box>
     </Page>
   );
 }

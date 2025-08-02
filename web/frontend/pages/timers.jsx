@@ -3,27 +3,30 @@ import React, { useState, useCallback } from "react";
 import {
   Page,
   Layout,
-  Card,
   Button,
   DataTable,
   Badge,
-  Stack,
-  TextStyle,
+  InlineStack,
+  BlockStack,
+  Text,
   Toast,
   Frame,
   Loading,
   EmptyState,
   Modal,
-  TextContainer,
+  Box,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useTimerAPI } from "../../hooks/useTimerAPI";
+import LiveCountdown from "../components/LiveCountdown";
 
 export default function TimersPage() {
   const { useTimers, useDeleteTimer, useToggleTimer } = useTimerAPI();
   const { data: timers = [], isLoading, error } = useTimers();
   const deleteTimerMutation = useDeleteTimer();
   const toggleTimerMutation = useToggleTimer();
+
+  const activeTimers = timers.filter(timer => timer.active);
 
   const [toastActive, setToastActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -79,19 +82,19 @@ export default function TimersPage() {
   };
 
   const getTimerStatus = (timer) => {
-    if (!timer.active) return <Badge status="critical">Inactive</Badge>;
+    if (!timer.active) return <Badge tone="critical">Inactive</Badge>;
     
     const now = new Date();
     const startTime = timer.startTime ? new Date(timer.startTime) : null;
     const endTime = timer.endTime ? new Date(timer.endTime) : null;
 
     if (startTime && now < startTime) {
-      return <Badge status="attention">Scheduled</Badge>;
+      return <Badge tone="warning">Scheduled</Badge>;
     }
     if (endTime && now > endTime) {
       return <Badge>Completed</Badge>;
     }
-    return <Badge status="success">Active</Badge>;
+    return <Badge tone="success">Active</Badge>;
   };
 
   const rows = timers.map((timer) => [
@@ -101,7 +104,7 @@ export default function TimersPage() {
     formatDate(timer.endTime),
     timer.productIds?.length || 0,
     timer.collectionIds?.length || 0,
-    <Stack spacing="tight" key={timer.id}>
+    <InlineStack gap="200" key={timer.id}>
       <Button
         size="slim"
         onClick={() => window.open(`/timers/${timer.id}`, "_self")}
@@ -117,13 +120,13 @@ export default function TimersPage() {
       </Button>
       <Button
         size="slim"
-        destructive
+        tone="critical"
         onClick={() => handleDeleteClick(timer)}
         loading={deleteTimerMutation.isLoading}
       >
         Delete
       </Button>
-    </Stack>,
+    </InlineStack>,
   ]);
 
   const headings = [
@@ -150,13 +153,13 @@ export default function TimersPage() {
         <TitleBar title="Countdown Timers" />
         <Layout>
           <Layout.Section>
-            <Card sectioned>
-              <TextContainer>
-                <TextStyle variation="negative">
+            <Box padding="400">
+              <div style={{ textAlign: "center" }}>
+                <Text tone="critical">
                   Error loading timers: {error.message}
-                </TextStyle>
-              </TextContainer>
-            </Card>
+                </Text>
+              </div>
+            </Box>
           </Layout.Section>
         </Layout>
       </Page>
@@ -192,23 +195,43 @@ export default function TimersPage() {
         <Layout>
           <Layout.Section>
             {timers.length === 0 ? (
-              <Card sectioned>{emptyStateMarkup}</Card>
+              <Box padding="400">
+                {emptyStateMarkup}
+              </Box>
             ) : (
-              <Card>
-                <DataTable
-                  columnContentTypes={[
-                    "text",
-                    "text",
-                    "text",
-                    "text",
-                    "numeric",
-                    "numeric",
-                    "text",
-                  ]}
-                  headings={headings}
-                  rows={rows}
-                />
-              </Card>
+              <BlockStack gap="400">
+                <Box padding="400">
+                  <DataTable
+                    columnContentTypes={[
+                      "text",
+                      "text",
+                      "text",
+                      "text",
+                      "numeric",
+                      "numeric",
+                      "text",
+                    ]}
+                    headings={headings}
+                    rows={rows}
+                  />
+                </Box>
+                
+                {/* Live Preview Section */}
+                {activeTimers.length > 0 && (
+                  <Box padding="400">
+                    <BlockStack gap="400">
+                      <Text variant="headingMd" as="h3">Live Timer Previews</Text>
+                      {activeTimers.slice(0, 3).map((timer) => (
+                        <LiveCountdown 
+                          key={timer.id} 
+                          timer={timer} 
+                          showPreview={false}
+                        />
+                      ))}
+                    </BlockStack>
+                  </Box>
+                )}
+              </BlockStack>
             )}
           </Layout.Section>
         </Layout>
@@ -232,12 +255,10 @@ export default function TimersPage() {
           ]}
         >
           <Modal.Section>
-            <TextContainer>
-              <p>
-                Are you sure you want to delete "{timerToDelete?.title || 'this timer'}"? 
-                This action cannot be undone.
-              </p>
-            </TextContainer>
+            <p>
+              Are you sure you want to delete "{timerToDelete?.title || 'this timer'}"? 
+              This action cannot be undone.
+            </p>
           </Modal.Section>
         </Modal>
 

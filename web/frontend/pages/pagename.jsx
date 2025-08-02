@@ -1,4 +1,4 @@
-import { Card, Page, Layout, TextContainer, Text } from "@shopify/polaris";
+import { Box, Page, Layout, Text, BlockStack } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useTranslation } from "react-i18next";
 
@@ -16,32 +16,51 @@ export default function PageName() {
       </TitleBar>
       <Layout>
         <Layout.Section>
-          <Card sectioned>
-            <Text variant="headingMd" as="h2">
-              {t("PageName.heading")}
-            </Text>
-            <TextContainer>
-              <p>{t("PageName.body")}</p>
-            </TextContainer>
-          </Card>
-          <Card sectioned>
-            <Text variant="headingMd" as="h2">
-              {t("PageName.heading")}
-            </Text>
-            <TextContainer>
-              <p>{t("PageName.body")}</p>
-            </TextContainer>
-          </Card>
+          <Box padding="400">
+            <BlockStack gap="400">
+              <Text variant="headingMd" as="h2">
+                Page name
+              </Text>
+              <Text variant="bodyMd">
+                Use this page to build your app to the specifications in the
+                project brief found within the README.md file in this workspace.
+              </Text>
+            </BlockStack>
+          </Box>
         </Layout.Section>
-        <Layout.Section secondary>
-          <Card sectioned>
-            <Text variant="headingMd" as="h2">
-              {t("PageName.heading")}
-            </Text>
-            <TextContainer>
-              <p>{t("PageName.body")}</p>
-            </TextContainer>
-          </Card>
+        <Layout.Section>
+          <Box padding="400">
+            <BlockStack gap="400">
+              <Text variant="headingMd" as="h2">
+                Resources
+              </Text>
+              <Text variant="bodyMd">
+                Ready to get started? Check out{" "}
+                <a
+                  target="_blank"
+                  href="https://shopify.dev/docs/apps/getting-started"
+                  rel="noreferrer"
+                >
+                  Shopify app development
+                </a>
+                .
+              </Text>
+            </BlockStack>
+          </Box>
+        </Layout.Section>
+        <Layout.Section>
+          <Box padding="400">
+            <BlockStack gap="400">
+              <Text variant="headingMd" as="h2">
+                Next steps
+              </Text>
+              <Text variant="bodyMd">
+                Explore the codebase to understand how the different parts work,
+                from the UI components in the web/frontend directory to the
+                Shopify CLI commands that power the backend.
+              </Text>
+            </BlockStack>
+          </Box>
         </Layout.Section>
       </Layout>
     </Page>

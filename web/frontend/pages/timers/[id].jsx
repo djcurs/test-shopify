@@ -4,26 +4,23 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Page,
   Layout,
-  Card,
   Form,
   FormLayout,
   TextField,
   Select,
   Checkbox,
   Button,
-  Stack,
+  InlineStack,
+  BlockStack,
   Toast,
   Frame,
   Loading,
-  TextStyle,
-  Subheading,
-  ColorPicker,
-  RangeSlider,
-  TextContainer,
-  Banner,
+  Text,
+  Box,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { useTimerAPI } from "../../../hooks/useTimerAPI";
+import LiveCountdown from "../../components/LiveCountdown";
 
 export default function TimerForm() {
   const { id } = useParams();
@@ -196,7 +193,7 @@ export default function TimerForm() {
         
         <Layout>
           <Layout.Section>
-            <Card sectioned>
+            <Box padding="400">
               <Form onSubmit={handleSubmit}>
                 <FormLayout>
                   <TextField
@@ -208,7 +205,7 @@ export default function TimerForm() {
                     helpText="Give your timer a descriptive name"
                   />
 
-                  <FormLayout.Group>
+                  <InlineStack gap="400">
                     <TextField
                       label="Start Time (Optional)"
                       type="datetime-local"
@@ -225,7 +222,7 @@ export default function TimerForm() {
                       error={errors.endTime}
                       helpText="When should the timer end?"
                     />
-                  </FormLayout.Group>
+                  </InlineStack>
 
                   <TextField
                     label="Duration (minutes, optional)"
@@ -261,133 +258,138 @@ export default function TimerForm() {
                   />
                 </FormLayout>
               </Form>
-            </Card>
+            </Box>
           </Layout.Section>
 
           <Layout.Section secondary>
-            <Card sectioned title="Timer Messages">
-              <FormLayout>
-                <TextField
-                  label="Before Message"
-                  value={formData.beforeMessage}
-                  onChange={handleInputChange("beforeMessage")}
-                  placeholder="Limited time offer!"
-                  helpText="Message shown before the countdown"
-                />
-
-                <TextField
-                  label="After Message"
-                  value={formData.afterMessage}
-                  onChange={handleInputChange("afterMessage")}
-                  placeholder="Offer has ended"
-                  helpText="Message shown after timer expires"
-                />
-              </FormLayout>
-            </Card>
-
-            <Card sectioned title="Timer Behavior">
-              <FormLayout>
-                <Checkbox
-                  label="Loop Timer"
-                  checked={formData.loop}
-                  onChange={handleInputChange("loop")}
-                  helpText="Restart the timer when it expires"
-                />
-
-                <Checkbox
-                  label="Hide After Completion"
-                  checked={formData.hideAfterCompletion}
-                  onChange={handleInputChange("hideAfterCompletion")}
-                  helpText="Hide the timer completely when it expires"
-                />
-
-                <Checkbox
-                  label="Active"
-                  checked={formData.active}
-                  onChange={handleInputChange("active")}
-                  helpText="Whether this timer is currently active"
-                />
-              </FormLayout>
-            </Card>
-
-            <Card sectioned title="Timer Style">
-              <FormLayout>
-                <Stack vertical spacing="loose">
-                  <div>
-                    <TextStyle variation="subdued">Background Color</TextStyle>
-                    <ColorPicker
-                      color={formData.style.backgroundColor}
-                      onChange={handleStyleChange("backgroundColor")}
+            <BlockStack gap="400">
+              {/* Timer Messages */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Timer Messages</Text>
+                  <FormLayout>
+                    <TextField
+                      label="Before Message"
+                      value={formData.beforeMessage}
+                      onChange={handleInputChange("beforeMessage")}
+                      placeholder="Limited time offer!"
+                      helpText="Message shown before the countdown"
                     />
-                  </div>
 
-                  <div>
-                    <TextStyle variation="subdued">Text Color</TextStyle>
-                    <ColorPicker
-                      color={formData.style.textColor}
-                      onChange={handleStyleChange("textColor")}
+                    <TextField
+                      label="After Message"
+                      value={formData.afterMessage}
+                      onChange={handleInputChange("afterMessage")}
+                      placeholder="Offer has ended"
+                      helpText="Message shown after timer expires"
                     />
-                  </div>
+                  </FormLayout>
+                </BlockStack>
+              </Box>
 
-                  <RangeSlider
-                    label="Font Size"
-                    value={formData.style.fontSize}
-                    min={10}
-                    max={32}
-                    onChange={handleStyleChange("fontSize")}
-                    suffix={`${formData.style.fontSize}px`}
+              {/* Timer Behavior */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Timer Behavior</Text>
+                  <FormLayout>
+                    <Checkbox
+                      label="Loop Timer"
+                      checked={formData.loop}
+                      onChange={handleInputChange("loop")}
+                      helpText="Restart the timer when it expires"
+                    />
+
+                    <Checkbox
+                      label="Hide After Completion"
+                      checked={formData.hideAfterCompletion}
+                      onChange={handleInputChange("hideAfterCompletion")}
+                      helpText="Hide the timer completely when it expires"
+                    />
+
+                    <Checkbox
+                      label="Active"
+                      checked={formData.active}
+                      onChange={handleInputChange("active")}
+                      helpText="Whether this timer is currently active"
+                    />
+                  </FormLayout>
+                </BlockStack>
+              </Box>
+
+              {/* Timer Style */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Timer Style</Text>
+                  <FormLayout>
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Background Color"
+                        value={formData.style.backgroundColor}
+                        onChange={handleStyleChange("backgroundColor")}
+                        placeholder="#000000"
+                      />
+                      <TextField
+                        label="Text Color"
+                        value={formData.style.textColor}
+                        onChange={handleStyleChange("textColor")}
+                        placeholder="#ffffff"
+                      />
+                    </InlineStack>
+
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Font Size (px)"
+                        type="number"
+                        value={formData.style.fontSize.toString()}
+                        onChange={(value) => handleStyleChange("fontSize")(parseInt(value) || 16)}
+                        min={10}
+                        max={32}
+                      />
+                      <Select
+                        label="Font Family"
+                        options={fontFamilyOptions}
+                        value={formData.style.fontFamily}
+                        onChange={handleStyleChange("fontFamily")}
+                      />
+                    </InlineStack>
+
+                    <InlineStack gap="400">
+                      <TextField
+                        label="Border Radius (px)"
+                        type="number"
+                        value={formData.style.borderRadius.toString()}
+                        onChange={(value) => handleStyleChange("borderRadius")(parseInt(value) || 4)}
+                        min={0}
+                        max={20}
+                      />
+                      <TextField
+                        label="Padding (px)"
+                        type="number"
+                        value={formData.style.padding.toString()}
+                        onChange={(value) => handleStyleChange("padding")(parseInt(value) || 12)}
+                        min={4}
+                        max={32}
+                      />
+                    </InlineStack>
+                  </FormLayout>
+                </BlockStack>
+              </Box>
+
+              {/* Live Timer Preview */}
+              <Box padding="400">
+                <BlockStack gap="400">
+                  <Text variant="headingSm" as="h3">Live Preview</Text>
+                  <LiveCountdown 
+                    timer={{
+                      ...formData,
+                      startTime: formData.startTime ? new Date(formData.startTime).toISOString() : null,
+                      endTime: formData.endTime ? new Date(formData.endTime).toISOString() : null,
+                    }}
+                    showPreview={true}
                   />
-
-                  <Select
-                    label="Font Family"
-                    options={fontFamilyOptions}
-                    value={formData.style.fontFamily}
-                    onChange={handleStyleChange("fontFamily")}
-                  />
-
-                  <RangeSlider
-                    label="Border Radius"
-                    value={formData.style.borderRadius}
-                    min={0}
-                    max={20}
-                    onChange={handleStyleChange("borderRadius")}
-                    suffix={`${formData.style.borderRadius}px`}
-                  />
-
-                  <RangeSlider
-                    label="Padding"
-                    value={formData.style.padding}
-                    min={4}
-                    max={32}
-                    onChange={handleStyleChange("padding")}
-                    suffix={`${formData.style.padding}px`}
-                  />
-                </Stack>
-              </FormLayout>
-            </Card>
-
-            {/* Timer Preview */}
-            <Card sectioned title="Preview">
-              <div
-                style={{
-                  backgroundColor: formData.style.backgroundColor,
-                  color: formData.style.textColor,
-                  fontSize: `${formData.style.fontSize}px`,
-                  fontFamily: formData.style.fontFamily,
-                  borderRadius: `${formData.style.borderRadius}px`,
-                  padding: `${formData.style.padding}px`,
-                  textAlign: "center",
-                  border: "1px solid #e1e3e5",
-                }}
-              >
-                <div style={{ marginBottom: "8px" }}>
-                  {formData.beforeMessage}
-                </div>
-                <div style={{ fontWeight: "bold", fontSize: "1.2em" }}>
-                  2d 14h 32m 45s
-                </div>
-              </div>
-            </Card>
+                </BlockStack>
+              </Box>
+            </BlockStack>
           </Layout.Section>
         </Layout>
 
