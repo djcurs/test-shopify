@@ -1,0 +1,198 @@
+/* Preact Countdown Timer Widget Styles */
+
+.countdown-container {
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  .countdown-timer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+  }
+  
+  /* Urgent state with animation as per PRD urgency notification */
+  .countdown-timer.urgent {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    animation: urgentPulse 2s infinite;
+    animation: pulse-border 1s infinite;
+    border: 2px solid var(--pulse-color, #ff0000);
+  }
+  
+  .countdown-timer.expired {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  }
+  
+  @keyframes urgentPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes pulse-border {
+    0% {
+      box-shadow: 0 0 0 0 var(--pulse-color, #ff0000);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255,0,0,0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255,0,0,0);
+    }
+  }
+  
+  .countdown-title {
+    margin: 0 0 10px 0;
+    font-size: 1.4rem;
+    font-weight: bold;
+  }
+  
+  .countdown-message {
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    opacity: 0.9;
+    line-height: 1.4;
+  }
+  
+  .countdown-display {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+  }
+  
+  .countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 8px;
+    border-radius: 8px;
+  }
+  
+  .countdown-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  
+  .countdown-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+  }
+  
+  .countdown-expired {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 10px;
+  }
+  
+  .countdown-ongoing {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+  
+  /* Urgency notification as specified in PRD */
+  .countdown-urgency {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-top: 10px;
+    display: inline-block;
+    animation: urgentBlink 1s infinite alternate;
+  }
+
+  .countdown-urgency.pulse {
+    animation: pulse-banner 1s infinite;
+  }
+
+  @keyframes pulse-banner {
+    0% {
+      background-color: var(--pulse-color, #ff0000);
+      color: #fff;
+    }
+    50% {
+      background-color: #fff;
+      color: var(--pulse-color, #ff0000);
+    }
+    100% {
+      background-color: var(--pulse-color, #ff0000);
+      color: #fff;
+    }
+  }
+  
+  @keyframes urgentBlink {
+    0% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+  
+  .countdown-loading, .countdown-error {
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+  
+  .countdown-loading {
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+  }
+  
+  .countdown-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  /* Responsive design for mobile */
+  @media (max-width: 768px) {
+    .countdown-display {
+      gap: 10px;
+    }
+    
+    .countdown-number {
+      font-size: 1.5rem;
+    }
+    
+    .countdown-unit {
+      min-width: 50px;
+      padding: 8px 6px;
+    }
+    
+    .countdown-timer {
+      padding: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .countdown-display {
+      gap: 8px;
+    }
+    
+    .countdown-number {
+      font-size: 1.3rem;
+    }
+    
+    .countdown-unit {
+      min-width: 45px;
+      padding: 6px 4px;
+    }
+  }

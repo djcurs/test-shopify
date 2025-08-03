@@ -7,6 +7,7 @@
     "shopify": "shopify",
     "build": "shopify app build",
     "dev": "shopify app dev",
+    "dev:widget": "cd web/widgets && npm run dev --watch",
     "info": "shopify app info",
     "generate": "shopify app generate",
     "deploy": "shopify app deploy"

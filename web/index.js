@@ -34,6 +34,102 @@ app.post(
   shopify.processWebhooks({ webhookHandlers: PrivacyWebhookHandlers })
 );
 
+
+
+
+app.get("/api/public/timers/active", async (req, res) => {
+  try {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    
+    const { shop } = req.query;
+    const shopId = Array.isArray(shop) ? shop[0] : shop;
+    if (!shopId) {
+      return res.status(400).json({ error: 'Shop parameter is required' });
+    }
+
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const activeTimers = await prisma.timer.findMany({
+      where: {
+        shopId: shopId,
+        active: true,
+        OR: [
+          { endTime: null },
+          { endTime: { gt: new Date() } }
+        ]
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.status(200).json(activeTimers);
+  } catch (error) {
+    console.error(`Failed to fetch active timers: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/public/timers/product/:shopId/:productId", async (req, res) => {
+  try {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    
+    const { shopId, productId } = req.params;
+    console.log('Fetching timers for:', { shopId, productId });
+
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+
+    const productTimers = await prisma.timer.findMany({
+      where: {
+        shopId: shopId,
+        active: true,
+        OR: [
+          { productIds: { has: productId } },
+          { productIds: { equals: [] } }
+        ],
+        AND: [
+          {
+            OR: [
+              { startTime: null }, 
+              { startTime: { lte: new Date() } } 
+            ]
+          },
+          {
+            OR: [
+              { endTime: null }, 
+              { endTime: { gt: new Date() } } 
+            ]
+          }
+        ]
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    console.log(`Found ${productTimers.length} timers for product ${productId}`);
+    res.status(200).json(productTimers);
+  } catch (error) {
+    console.error(`Failed to fetch product timers: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
+    
+app.options('/api/public/*', (_, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.status(200).end();
+});
+
+app.use('/widgets', express.static(join(process.cwd(), 'widgets/dist')));
+
+
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
@@ -79,39 +175,6 @@ app.get("/api/collections", async (_req, res) => {
   }
 });
 
-app.get("/api/public/timers/active", async (req, res) => {
-  try {
-    const { shop } = req.query;
-    
-    const shopId = Array.isArray(shop) ? shop[0] : shop;
-    
-    if (!shopId) {
-      return res.status(400).json({ 
-        error: 'Shop parameter is required' 
-      });
-    }
-
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-
-    const activeTimers = await prisma.timer.findMany({
-      where: {
-        shopId: shopId,
-        active: true,
-        OR: [
-          { endTime: null },
-          { endTime: { gt: new Date() } }
-        ]
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    res.status(200).json(activeTimers);
-  } catch (error) {
-    console.error(`Failed to fetch active timers: ${error.message}`);
-    res.status(500).json({ error: error.message });
-  }
-});
 app.get("/api/products/count", async (_req, res) => {
   try {
     const client = new shopify.api.clients.Graphql({
@@ -144,7 +207,9 @@ app.get("/api/shop", async (_req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-  
+
+app.use('/widget', express.static(join(process.cwd(), 'preact-countdown-widget/dist')));
+
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ 
     status: 'OK', 

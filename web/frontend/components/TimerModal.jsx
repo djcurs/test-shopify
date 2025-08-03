@@ -27,8 +27,7 @@ export default function TimerModal({
   const { useCreateTimer, useUpdateTimer } = useTimerAPI();
   const createTimerMutation = useCreateTimer();
   const updateTimerMutation = useUpdateTimer();
-
-  // Form state - store colors as hex strings
+  
   const [formData, setFormData] = useState({
     title: "",
     productIds: [],
@@ -60,7 +59,6 @@ export default function TimerModal({
 
   const [errors, setErrors] = useState({});
 
-  // Load timer data for editing
   useEffect(() => {
     console.log("Effect triggered - timer:", timer, "isEdit:", isEdit, "open:", open);
     
@@ -136,7 +134,6 @@ export default function TimerModal({
     }
   }, [errors]);
 
-  // Handle color changes from react-colorful
   const handleColorChange = useCallback((colorField) => (color) => {
     console.log(`Color change - ${colorField}:`, color);
     
@@ -146,7 +143,6 @@ export default function TimerModal({
     }));
   }, []);
 
-  // Handle non-color style changes
   const handleStyleChange = useCallback((styleField) => (value) => {
     console.log(`Style change - ${styleField}:`, value);
     setFormData((prev) => ({
@@ -175,13 +171,11 @@ export default function TimerModal({
       }
     }
 
-    // Validate urgency settings
     if (formData.urgencySettings.enabled) {
       if (formData.urgencySettings.triggerMinutes < 1 || formData.urgencySettings.triggerMinutes > 60) {
         newErrors.urgencyTrigger = "Trigger minutes must be between 1 and 60";
       }
       
-      // Validate hex color format
       const hexColorRegex = /^#[0-9A-F]{6}$/i;
       if (!hexColorRegex.test(formData.urgencySettings.pulseColor)) {
         newErrors.urgencyColor = "Pulse color must be a valid hex color (e.g., #ff0000)";
@@ -233,7 +227,6 @@ export default function TimerModal({
 
   const isLoading = createTimerMutation.isLoading || updateTimerMutation.isLoading;
 
-  // Create timer object for preview
   const previewTimer = {
     ...formData,
     style: formData.style,
@@ -265,7 +258,6 @@ export default function TimerModal({
       >
       <Modal.Section>
         <div style={{ display: "flex", gap: "48px" }}>
-          {/* Main Form */}
           <div style={{ flex: 1, minWidth: "0" }}>
             <Form onSubmit={handleSubmit}>
               <FormLayout>
@@ -364,7 +356,6 @@ export default function TimerModal({
 
                 <Divider />
 
-                {/* Urgency Notification Settings */}
                 <BlockStack gap="400">
                   <Text variant="headingSm" as="h3">Urgency Notification Settings</Text>
                   
@@ -465,10 +456,8 @@ export default function TimerModal({
             </Form>
           </div>
 
-          {/* Live Preview and Style Settings */}
           <div style={{ width: "360px", position: "sticky", top: "0" }}>
             <BlockStack gap="400">
-              {/* Live Preview */}
               <Box padding="400">
                 <BlockStack gap="400">
                   <Text variant="headingSm" as="h3">Live Preview</Text>
@@ -484,7 +473,6 @@ export default function TimerModal({
                       compact={true}
                     />
                   </div>
-                  {/* Debug info */}
                   <div style={{ fontSize: '10px', color: '#666', wordBreak: 'break-all' }}>
                     <div>BG: {formData.style.backgroundColor}</div>
                     <div>Text: {formData.style.textColor}</div>
@@ -492,12 +480,10 @@ export default function TimerModal({
                 </BlockStack>
               </Box>
 
-              {/* Style Settings */}
               <Box padding="400">
                 <BlockStack gap="400">
                   <Text variant="headingSm" as="h3">Style Settings</Text>
 
-                  {/* Background Color */}
                   <BlockStack gap="300">
                     <Text variant="bodySm" tone="subdued">Background Color</Text>
                     <div style={{ 
@@ -520,7 +506,6 @@ export default function TimerModal({
                     />
                   </BlockStack>
 
-                  {/* Text Color */}
                   <BlockStack gap="300">
                     <Text variant="bodySm" tone="subdued">Text Color</Text>
                     <div style={{ 

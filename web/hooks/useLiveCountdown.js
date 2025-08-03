@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 
 export function useLiveCountdown(timer) {
   const [timeLeft, setTimeLeft] = useState(null);
-  const [timerState, setTimerState] = useState("loading"); // loading, before, active, expired
+  const [timerState, setTimerState] = useState("loading");
   const [loopCount, setLoopCount] = useState(0);
 
-  // Calculate time remaining and timer state
   const calculateTimeLeft = useCallback(() => {
     if (!timer) return;
 
@@ -13,14 +12,12 @@ export function useLiveCountdown(timer) {
     const startTime = timer.startTime ? new Date(timer.startTime) : null;
     const endTime = timer.endTime ? new Date(timer.endTime) : null;
 
-    // Determine timer state
     if (startTime && now < startTime) {
       setTimerState("before");
       setTimeLeft(startTime - now);
     } else if (endTime && now > endTime) {
       if (timer.loop && timer.duration) {
-        // Handle looping - restart timer
-        const loopDuration = timer.duration * 60 * 1000; // Convert to milliseconds
+        const loopDuration = timer.duration * 60 * 1000;
         const timeSinceExpiry = now - endTime;
         const loopsCompleted = Math.floor(timeSinceExpiry / loopDuration);
         const nextLoopStart = new Date(endTime.getTime() + (loopsCompleted + 1) * loopDuration);
@@ -37,7 +34,6 @@ export function useLiveCountdown(timer) {
       if (endTime) {
         setTimeLeft(endTime - now);
       } else if (timer.duration) {
-        // Calculate end time based on duration
         const endTimeFromDuration = new Date(now.getTime() + (timer.duration * 60 * 1000));
         setTimeLeft(endTimeFromDuration - now);
       } else {
@@ -46,7 +42,6 @@ export function useLiveCountdown(timer) {
     }
   }, [timer]);
 
-  // Update countdown every second
   useEffect(() => {
     calculateTimeLeft();
     
@@ -57,7 +52,6 @@ export function useLiveCountdown(timer) {
     return () => clearInterval(interval);
   }, [calculateTimeLeft]);
 
-  // Format time remaining
   const formatTimeLeft = (milliseconds) => {
     if (milliseconds <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
 
@@ -69,7 +63,6 @@ export function useLiveCountdown(timer) {
     return { days, hours, minutes, seconds };
   };
 
-  // Get timer message based on state
   const getTimerMessage = () => {
     switch (timerState) {
       case "before":
@@ -83,7 +76,6 @@ export function useLiveCountdown(timer) {
     }
   };
 
-  // Check if timer should be hidden
   const shouldHide = () => {
     if (timerState === "expired" && timer.hideAfterCompletion) {
       return true;
@@ -91,7 +83,6 @@ export function useLiveCountdown(timer) {
     return false;
   };
 
-  // Check if urgency mode should be active
   const isUrgencyMode = () => {
     if (!timer.urgencySettings?.enabled || timerState !== "active") {
       return false;

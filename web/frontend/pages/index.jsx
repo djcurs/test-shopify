@@ -82,11 +82,9 @@ export default function HomePage() {
     setEditingTimer(null);
   }, []);
 
-  // Filter and sort timers
   const filteredAndSortedTimers = useMemo(() => {
     let filtered = timers;
 
-    // Apply search filter
     if (searchQuery.trim()) {
       filtered = timers.filter(timer => 
         timer.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -95,7 +93,6 @@ export default function HomePage() {
       );
     }
 
-    // Apply sorting (always newest first for dates, alphabetical for text)
     filtered.sort((a, b) => {
       let aValue, bValue;
 
@@ -107,27 +104,26 @@ export default function HomePage() {
         case "status":
           aValue = a.active ? 1 : 0;
           bValue = b.active ? 1 : 0;
-          return bValue - aValue; // Active first
+          return bValue - aValue;
         case "startTime":
           aValue = a.startTime ? new Date(a.startTime).getTime() : 0;
           bValue = b.startTime ? new Date(b.startTime).getTime() : 0;
-          return bValue - aValue; // Newest first
+          return bValue - aValue;
         case "endTime":
           aValue = a.endTime ? new Date(a.endTime).getTime() : 0;
           bValue = b.endTime ? new Date(b.endTime).getTime() : 0;
-          return bValue - aValue; // Newest first
+          return bValue - aValue;
         case "createdAt":
         default:
           aValue = new Date(a.createdAt).getTime();
           bValue = new Date(b.createdAt).getTime();
-          return bValue - aValue; // Newest first
+          return bValue - aValue;
       }
     });
 
     return filtered;
   }, [timers, searchQuery, sortBy]);
 
-  // Prepare table data
   const tableRows = filteredAndSortedTimers.map((timer) => {
     const status = timer.active 
       ? <Badge tone="success">Active</Badge>
@@ -224,8 +220,7 @@ export default function HomePage() {
                 </EmptyState>
               </Box>
             ) : (
-              <BlockStack gap="400">
-                {/* Timer Stats */}
+              <BlockStack gap="400">    
                 <Box padding="600">
                   <BlockStack gap="400">
                     <InlineStack align="space-between" blockAlign="center">
@@ -254,7 +249,6 @@ export default function HomePage() {
                   </BlockStack>
                 </Box>
 
-                {/* Search and Sort Controls */}
                 <Box padding="600">
                   <BlockStack gap="400">
                     <InlineStack gap="400" align="space-between">
@@ -292,7 +286,6 @@ export default function HomePage() {
                   </BlockStack>
                 </Box>
 
-                {/* Timer Table */}
                 <Box padding="600">
                   <DataTable
                     columnContentTypes={[
@@ -313,7 +306,6 @@ export default function HomePage() {
           </Layout.Section>
         </Layout>
 
-        {/* Timer Modal */}
         <TimerModal
           open={modalOpen}
           onClose={handleModalClose}
@@ -321,7 +313,6 @@ export default function HomePage() {
           onSuccess={handleModalSuccess}
         />
 
-        {/* Delete Confirmation Modal */}
         <Modal
           open={showDeleteConfirm}
           onClose={handleDeleteCancel}
@@ -350,7 +341,6 @@ export default function HomePage() {
           </Modal.Section>
         </Modal>
 
-        {/* Toast */}
         {toastActive && (
           <Toast
             content={toastMessage}

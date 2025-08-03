@@ -6,7 +6,6 @@ export function useTimerAPI() {
   const fetch = useAuthenticatedFetch();
   const queryClient = useQueryClient();
     
-  // Fetch all timers
   const useTimers = () => {
     return useQuery("timers", async () => {
       const response = await fetch("/api/timers");
@@ -17,7 +16,6 @@ export function useTimerAPI() {
     });
   };
 
-  // Fetch single timer
   const useTimer = (id) => {
     return useQuery(
       ["timer", id],
@@ -34,7 +32,6 @@ export function useTimerAPI() {
     );
   };
 
-  // Create timer mutation
   const useCreateTimer = () => {
     return useMutation(
       async (timerData) => {
@@ -60,7 +57,6 @@ export function useTimerAPI() {
     );
   };
 
-  // Update timer mutation
   const useUpdateTimer = () => {
     return useMutation(
       async ({ id, ...timerData }) => {
@@ -85,7 +81,6 @@ export function useTimerAPI() {
     );
   };
 
-  // Delete timer mutation
   const useDeleteTimer = () => {
     return useMutation(
       async (id) => {
@@ -103,8 +98,7 @@ export function useTimerAPI() {
       }
     );
   };
-
-  // Toggle timer active status
+  
   const useToggleTimer = () => {
     return useMutation(
       async ({ id, active }) => {
